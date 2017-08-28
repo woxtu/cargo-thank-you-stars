@@ -1,26 +1,28 @@
 #[macro_use]
 extern crate error_chain;
+extern crate serde;
+#[macro_use]
+extern crate serde_derive;
 extern crate toml;
 
 mod errors;
+mod lockfile;
 
 use std::env;
-use std::io::Read;
-use std::fs::File;
 
 use errors::*;
 
 quick_main!(|| -> Result<()> {
   let path = env::current_dir()?.join("Cargo.lock");
-  let mut contents = String::new();
-  let _ = File::open(&path)?.read_to_string(&mut contents)?;
+  if !path.exists() {
+    bail!("Run `cargo install` before")
+  }
+  let lockfile = lockfile::read(&path)
+    .chain_err(|| "Cannot read Cargo.lock")?;
 
-  let lockfile = toml::from_str::<toml::Value>(&contents)?;
-  let dependencies = lockfile["root"]["dependencies"].as_array().unwrap();
-  let dependencies = dependencies.into_iter().flat_map(|v| v.as_str());
-  for dependency in dependencies {
-    if dependency.ends_with("(registry+https://github.com/rust-lang/crates.io-index)") {
-      println!("{}", dependency.split_whitespace().next().unwrap());
+  for dependency in lockfile.root.dependencies {
+    if dependency.is_registry() {
+      println!("{}", dependency.crate_id())
     }
   }
 

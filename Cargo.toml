@@ -5,4 +5,6 @@ authors = ["woxtu <woxtup@gmail.com>"]
 
 [dependencies]
 error-chain = "*"
+serde = "*"
+serde_derive = "*"
 toml = "*"
