@@ -2,16 +2,13 @@
 extern crate error_chain;
 extern crate toml;
 
-use std::{env, io};
+mod errors;
+
+use std::env;
 use std::io::Read;
 use std::fs::File;
 
-error_chain! {
-  foreign_links {
-    Io(io::Error);
-    Toml(toml::de::Error);
-  }
-}
+use errors::*;
 
 quick_main!(|| -> Result<()> {
   let path = env::current_dir()?.join("Cargo.lock");
