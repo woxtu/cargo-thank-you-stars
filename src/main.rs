@@ -4,13 +4,15 @@ extern crate reqwest;
 extern crate serde;
 #[macro_use]
 extern crate serde_derive;
+extern crate serde_json as json;
 extern crate toml;
+extern crate url;
 
+mod crates_io;
 mod errors;
 mod lockfile;
 
 use std::env;
-use std::io::Read;
 
 use errors::*;
 
@@ -24,10 +26,10 @@ quick_main!(|| -> Result<()> {
 
   for dependency in lockfile.root.dependencies {
     if dependency.is_registry() {
-      let mut contents = String::new();
-      let _ = reqwest::get(&format!("https://crates.io/api/v1/crates/{}", dependency.crate_id()))?
-        .read_to_string(&mut contents)?;
-      println!("{}", contents);
+      let krate = crates_io::get(&dependency.crate_id())
+        .chain_err(|| "Cannot get crate data from crates.io")?;
+
+      println!("{:?}", krate)
     }
   }
 
