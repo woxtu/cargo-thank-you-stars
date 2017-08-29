@@ -8,6 +8,7 @@ extern crate serde_json as json;
 extern crate toml;
 extern crate url;
 
+mod config;
 mod crates_io;
 mod errors;
 mod lockfile;
@@ -17,6 +18,17 @@ use std::env;
 use errors::*;
 
 quick_main!(|| -> Result<()> {
+  let path = env::home_dir()
+    .expect("Cannot get home directory")
+    .join(".thank-you-stars.json");
+  if !path.exists() {
+    bail!("Save your configuration as {:?}", path)
+  }
+  let config = config::read(&path)
+    .chain_err(|| "Cannot read your configuration")?;
+
+  println!("{:?}", config);
+
   let path = env::current_dir()?.join("Cargo.lock");
   if !path.exists() {
     bail!("Run `cargo install` before")
