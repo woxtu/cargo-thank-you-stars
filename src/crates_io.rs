@@ -23,14 +23,14 @@ pub struct Metadata {
 }
 
 fn deserialize_url<'de, D: Deserializer<'de>>(deserializer: D) -> result::Result<Repository, D::Error> {
-  String::deserialize(deserializer).map(|s| {
-    match Url::parse(&s) {
+  Option::<String>::deserialize(deserializer)
+    .map(|s| s.unwrap_or("".to_owned()))
+    .map(|s| match Url::parse(&s) {
       Ok(ref url) if url.host_str() == Some("github.com") =>
         Repository::GitHub(url.path().trim_matches('/').to_owned()),
       Ok(_) => Repository::Other(s.to_owned()),
       Err(_) => Repository::None,
-    }
-  })
+    })
 }
 
 #[derive(Deserialize, Debug)]
@@ -54,4 +54,3 @@ pub fn get(crate_id: &str) -> Result<Crate> {
 
   Ok(json::from_str(&buffer)?)
 }
-
