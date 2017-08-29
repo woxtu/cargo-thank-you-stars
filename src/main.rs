@@ -11,10 +11,12 @@ extern crate url;
 mod config;
 mod crates_io;
 mod errors;
+mod github;
 mod lockfile;
 
 use std::env;
 
+use crates_io::Repository;
 use errors::*;
 
 quick_main!(|| -> Result<()> {
@@ -26,8 +28,6 @@ quick_main!(|| -> Result<()> {
   }
   let config = config::read(&path)
     .chain_err(|| "Cannot read your configuration")?;
-
-  println!("{:?}", config);
 
   let path = env::current_dir()?.join("Cargo.lock");
   if !path.exists() {
@@ -41,7 +41,12 @@ quick_main!(|| -> Result<()> {
       let krate = crates_io::get(&dependency.crate_id())
         .chain_err(|| "Cannot get crate data from crates.io")?;
 
-      println!("{:?}", krate)
+      if let Repository::GitHub(repository) = krate.repository() {
+        match github::star(&config.token, &repository) {
+          Ok(_) => println!("Starred! https://github.com/{}", &repository),
+          Err(e) => println!("{}", e),
+        }
+      }
     }
   }
 
