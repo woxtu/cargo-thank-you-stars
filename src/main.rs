@@ -36,7 +36,7 @@ quick_main!(|| -> Result<()> {
       if let Repository::GitHub(repository) = krate.repository() {
         match github::star(&config.token, &repository) {
           Ok(_) => println!("Starred! https://github.com/{}", &repository),
-          Err(e) => println!("{}", e),
+          Err(e) => eprintln!("{}", e.to_string()),
         }
       }
     }
