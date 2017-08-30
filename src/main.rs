@@ -20,21 +20,13 @@ use crates_io::Repository;
 use errors::*;
 
 quick_main!(|| -> Result<()> {
-  let path = env::home_dir()
-    .expect("Cannot get home directory")
-    .join(".thank-you-stars.json");
-  if !path.exists() {
-    bail!("Save your configuration as {:?}", path)
-  }
-  let config = config::read(&path)
-    .chain_err(|| "Cannot read your configuration")?;
+  let home_dir = env::home_dir().expect("Cannot get home directory");
 
-  let path = env::current_dir()?.join("Cargo.lock");
-  if !path.exists() {
-    bail!("Run `cargo install` before")
-  }
-  let lockfile = lockfile::read(&path)
-    .chain_err(|| "Cannot read Cargo.lock")?;
+  let config = config::read(&home_dir.join(".thank-you-stars.json"))
+    .chain_err(|| "Save your configuration as `.thank-you-stars.json`")?;
+
+  let lockfile = lockfile::read(&env::current_dir()?.join("Cargo.lock"))
+    .chain_err(|| "Run `cargo install` before")?;
 
   for dependency in lockfile.root.dependencies {
     if dependency.is_registry() {
