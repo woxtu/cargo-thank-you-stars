@@ -2,6 +2,9 @@
 name = "cargo-thank-you-stars"
 version = "0.1.0"
 authors = ["woxtu <woxtup@gmail.com>"]
+description = "Give your dependencies stars on GitHub!"
+repository = "https://github.com/woxtu/cargo-thank-you-stars"
+license = "MIT"
 
 [dependencies]
 error-chain = "0.10.0"
