@@ -1,6 +1,9 @@
 # cargo-thank-you-stars
 
+[![Crates.io](https://img.shields.io/crates/v/cargo-thank-you-stars.svg?style=flat-square)](https://crates.io/crates/cargo-thank-you-stars)
+
 Give your dependencies stars on GitHub!
+
 This is cargo subcommand implementation of [teppeis/thank-you-stars](https://github.com/teppeis/thank-you-stars).
 
 ## Installation
@@ -8,7 +11,7 @@ This is cargo subcommand implementation of [teppeis/thank-you-stars](https://git
 `cargo-thank-you-stars` can be installed with `cargo install`:
 
 ```console
-$ cargo install --git https://github.com/woxtu/cargo-thank-you-stars
+$ cargo install cargo-thank-you-stars
 ```
 
 Save your GitHub personal access token:
