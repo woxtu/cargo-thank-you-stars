@@ -32,15 +32,17 @@ impl<'de> serde::Deserialize<'de> for Dependency {
 }
 
 #[derive(Deserialize, Debug)]
-pub struct Root {
+pub struct Package {
   pub name: String,
   pub version: String,
+  #[serde(default = "Vec::new")]
   pub dependencies: Vec<Dependency>,
 }
 
 #[derive(Deserialize, Debug)]
 pub struct Lockfile {
-  pub root: Root,
+  #[serde(rename = "package")]
+  pub packages: Vec<Package>,
 }
 
 pub fn read(path: &Path) -> Result<Lockfile> {

@@ -28,15 +28,21 @@ quick_main!(|| -> Result<()> {
   let lockfile = lockfile::read(&env::current_dir()?.join("Cargo.lock"))
     .chain_err(|| "Run `cargo install` before")?;
 
-  for dependency in lockfile.root.dependencies {
-    if dependency.is_registry() {
-      let krate = crates_io::get(&dependency.crate_id())
-        .chain_err(|| "Cannot get crate data from crates.io")?;
+  if let Some(package) = lockfile
+    .packages
+    .iter()
+    .find(|package| package.name == env!("CARGO_PKG_NAME"))
+  {
+    for dependency in &package.dependencies {
+      if dependency.is_registry() {
+        let krate = crates_io::get(&dependency.crate_id())
+          .chain_err(|| "Cannot get crate data from crates.io")?;
 
-      if let Repository::GitHub(repository) = krate.repository() {
-        match github::star(&config.token, &repository) {
-          Ok(_) => println!("Starred! https://github.com/{}", &repository),
-          Err(e) => eprintln!("{}", e.to_string()),
+        if let Repository::GitHub(repository) = krate.repository() {
+          match github::star(&config.token, &repository) {
+            Ok(_) => println!("Starred! https://github.com/{}", &repository),
+            Err(e) => eprintln!("{}", e.to_string()),
+          }
         }
       }
     }
