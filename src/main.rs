@@ -1,9 +1,8 @@
 #[macro_use]
 extern crate error_chain;
 extern crate reqwest;
-extern crate serde;
 #[macro_use]
-extern crate serde_derive;
+extern crate serde;
 extern crate serde_json as json;
 extern crate toml;
 extern crate url;

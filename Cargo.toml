@@ -7,10 +7,9 @@ repository = "https://github.com/woxtu/cargo-thank-you-stars"
 license = "MIT"
 
 [dependencies]
-error-chain = "0.10.0"
-reqwest = "0.7.3"
-serde = "1.0.11"
-serde_derive = "1.0.11"
-serde_json = "1.0.2"
-toml = "0.4.5"
-url = "1.5.1"
+error-chain = "0.12"
+reqwest = "0.9"
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+toml = "0.5"
+url = "1.7"

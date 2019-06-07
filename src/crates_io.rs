@@ -47,8 +47,8 @@ impl Crate {
 
 pub fn get(crate_id: &str) -> Result<Crate> {
   let mut buffer = String::new();
-  let _ = reqwest::Client::new()?
-    .get(&format!("https://crates.io/api/v1/crates/{}", crate_id))?
+  let _ = reqwest::Client::new()
+    .get(&format!("https://crates.io/api/v1/crates/{}", crate_id))
     .send()?
     .read_to_string(&mut buffer)?;
 
