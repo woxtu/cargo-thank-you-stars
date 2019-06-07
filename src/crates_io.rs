@@ -1,12 +1,8 @@
-use std::result;
 use std::io::Read;
-
-use json;
-use serde::{Deserialize, Deserializer};
-use reqwest;
+use std::result;
+use serde::Deserialize;
 use url::Url;
-
-use errors::*;
+use crate::errors::*;
 
 #[derive(Clone, Debug)]
 pub enum Repository {
@@ -22,12 +18,15 @@ pub struct Metadata {
   pub repository: Repository,
 }
 
-fn deserialize_url<'de, D: Deserializer<'de>>(deserializer: D) -> result::Result<Repository, D::Error> {
+fn deserialize_url<'de, D: serde::Deserializer<'de>>(
+  deserializer: D,
+) -> result::Result<Repository, D::Error> {
   Option::<String>::deserialize(deserializer)
     .map(|s| s.unwrap_or("".to_owned()))
     .map(|s| match Url::parse(&s) {
-      Ok(ref url) if url.host_str() == Some("github.com") =>
-        Repository::GitHub(url.path().trim_matches('/').to_owned()),
+      Ok(ref url) if url.host_str() == Some("github.com") => {
+        Repository::GitHub(url.path().trim_matches('/').to_owned())
+      }
       Ok(_) => Repository::Other(s.to_owned()),
       Err(_) => Repository::None,
     })

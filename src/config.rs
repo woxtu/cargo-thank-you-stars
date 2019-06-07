@@ -1,10 +1,7 @@
-use std::fs::File;
-use std::io::Read;
+use std::fs;
 use std::path::Path;
-
-use json;
-
-use errors::*;
+use serde::Deserialize;
+use crate::errors::*;
 
 #[derive(Deserialize, Debug)]
 pub struct Config {
@@ -12,7 +9,5 @@ pub struct Config {
 }
 
 pub fn read(path: &Path) -> Result<Config> {
-  let mut buffer = String::new();
-  let _ = File::open(&path)?.read_to_string(&mut buffer)?;
-  Ok(json::from_str(&buffer)?)
+  Ok(json::from_str(&fs::read_to_string(&path)?)?)
 }

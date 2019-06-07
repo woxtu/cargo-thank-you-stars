@@ -2,11 +2,13 @@
 name = "cargo-thank-you-stars"
 version = "0.1.0"
 authors = ["woxtu <woxtup@gmail.com>"]
+edition = "2018"
 description = "Give your dependencies stars on GitHub!"
 repository = "https://github.com/woxtu/cargo-thank-you-stars"
 license = "MIT"
 
 [dependencies]
+dirs = "2.0"
 error-chain = "0.12"
 reqwest = "0.9"
 serde = { version = "1.0", features = ["derive"] }

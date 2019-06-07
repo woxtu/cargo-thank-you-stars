@@ -1,12 +1,7 @@
-use std::result;
-use std::fs::File;
-use std::io::Read;
+use std::{fs, result};
 use std::path::Path;
-
-use serde;
-use toml;
-
-use errors::*;
+use serde::Deserialize;
+use crate::errors::*;
 
 #[derive(Debug)]
 pub struct Dependency {
@@ -46,7 +41,5 @@ pub struct Lockfile {
 }
 
 pub fn read(path: &Path) -> Result<Lockfile> {
-  let mut buffer = String::new();
-  let _ = File::open(&path)?.read_to_string(&mut buffer)?;
-  Ok(toml::from_str(&buffer)?)
+  Ok(toml::from_str(&fs::read_to_string(&path)?)?)
 }

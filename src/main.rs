@@ -1,11 +1,5 @@
-#[macro_use]
-extern crate error_chain;
-extern crate reqwest;
-#[macro_use]
-extern crate serde;
 extern crate serde_json as json;
-extern crate toml;
-extern crate url;
+use error_chain::quick_main;
 
 mod config;
 mod crates_io;
@@ -19,7 +13,7 @@ use crates_io::Repository;
 use errors::*;
 
 quick_main!(|| -> Result<()> {
-  let home_dir = env::home_dir().expect("Cannot get home directory");
+  let home_dir = dirs::home_dir().expect("Cannot get home directory");
 
   let config = config::read(&home_dir.join(".thank-you-stars.json"))
     .chain_err(|| "Save your configuration as `.thank-you-stars.json`")?;
