@@ -21,20 +21,12 @@ quick_main!(|| -> Result<()> {
     let lockfile = lockfile::read(&env::current_dir()?.join("Cargo.lock"))
         .chain_err(|| "Run `cargo install` before")?;
 
-    let mut dependencies: Vec<String> = vec![];
-
-    if let Some(package) = lockfile
-        .packages
-        .iter()
-        .find(|package| package.name == env!("CARGO_PKG_NAME"))
-    {
-        for dependency in &package.dependencies {
-            dependencies.append(&mut vec![dependency.raw.to_owned()]);
-        }
-    }
+    let mut starred: Vec<String> = vec![];
 
     for package in lockfile.packages {
-        if dependencies.contains(&package.name) && package.is_registry() {
+        if !starred.contains(&package.name) && package.is_registry() {
+            starred.append(&mut vec![package.name.to_owned()]);
+
             let krate = crates_io::get(&package.crate_id())
                 .chain_err(|| "Cannot get crate data from crates.io")?;
 
