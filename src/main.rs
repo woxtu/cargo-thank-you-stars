@@ -23,17 +23,24 @@ quick_main!(|| -> Result<()> {
 
     let mut starred: Vec<String> = vec![];
 
-    for package in lockfile.packages {
-        if !starred.contains(&package.name) && package.is_registry() {
-            starred.append(&mut vec![package.name.to_owned()]);
+    for package in lockfile
+        .packages
+        .into_iter()
+        .filter(|package| package.is_registry())
+    {
+        let krate = crates_io::get(&package.crate_id())
+            .chain_err(|| "Cannot get crate data from crates.io")?;
 
-            let krate = crates_io::get(&package.crate_id())
-                .chain_err(|| "Cannot get crate data from crates.io")?;
+        if let Repository::GitHub(repository) = krate.repository() {
+            if !starred.contains(&repository) {
+                starred.append(&mut vec![repository.to_owned()]);
 
-            if let Repository::GitHub(repository) = krate.repository() {
-                match github::star(&config.token, &repository) {
-                    Ok(_) => println!("Starred! https://github.com/{}", &repository),
-                    Err(e) => eprintln!("{}", e),
+                match github::check_if_starred(&config.token, &repository) {
+                    Ok(true) => println!("Already starred! https://github.com/{}", &repository),
+                    _ => match github::star(&config.token, &repository) {
+                        Ok(_) => println!("Starred! https://github.com/{}", &repository),
+                        Err(e) => eprintln!("{}", e),
+                    },
                 }
             }
         }

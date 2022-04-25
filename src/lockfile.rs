@@ -1,26 +1,13 @@
 use crate::errors::*;
 use serde::Deserialize;
+use std::fs;
 use std::path::Path;
-use std::{fs, result};
-
-#[derive(Debug)]
-pub struct Dependency {
-    pub raw: String,
-}
-
-impl<'de> serde::Deserialize<'de> for Dependency {
-    fn deserialize<D: serde::Deserializer<'de>>(deserializer: D) -> result::Result<Self, D::Error> {
-        String::deserialize(deserializer).map(|s| Dependency { raw: s })
-    }
-}
 
 #[derive(Deserialize, Debug)]
 pub struct Package {
     pub name: String,
     pub version: String,
     pub source: Option<String>,
-    #[serde(default = "Vec::new")]
-    pub dependencies: Vec<Dependency>,
 }
 
 impl Package {
