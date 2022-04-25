@@ -1,5 +1,5 @@
-use std::io;
 use error_chain::error_chain;
+use std::io;
 
 error_chain! {
   foreign_links {

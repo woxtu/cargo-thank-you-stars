@@ -1,55 +1,55 @@
+use crate::errors::*;
+use serde::Deserialize;
 use std::io::Read;
 use std::result;
-use serde::Deserialize;
 use url::Url;
-use crate::errors::*;
 
 #[derive(Clone, Debug)]
 pub enum Repository {
-  GitHub(String),
-  Other(String),
-  None,
+    GitHub(String),
+    Other(String),
+    None,
 }
 
 #[derive(Deserialize, Debug)]
 pub struct Metadata {
-  pub id: String,
-  #[serde(deserialize_with = "deserialize_url")]
-  pub repository: Repository,
+    pub id: String,
+    #[serde(deserialize_with = "deserialize_url")]
+    pub repository: Repository,
 }
 
 fn deserialize_url<'de, D: serde::Deserializer<'de>>(
-  deserializer: D,
+    deserializer: D,
 ) -> result::Result<Repository, D::Error> {
-  Option::<String>::deserialize(deserializer)
-    .map(|s| s.unwrap_or("".to_owned()))
-    .map(|s| match Url::parse(&s) {
-      Ok(ref url) if url.host_str() == Some("github.com") => {
-        Repository::GitHub(url.path().trim_matches('/').to_owned())
-      }
-      Ok(_) => Repository::Other(s.to_owned()),
-      Err(_) => Repository::None,
-    })
+    Option::<String>::deserialize(deserializer)
+        .map(|s| s.unwrap_or_else(|| "".to_owned()))
+        .map(|s| match Url::parse(&s) {
+            Ok(ref url) if url.host_str() == Some("github.com") => {
+                Repository::GitHub(url.path().trim_matches('/').to_owned())
+            }
+            Ok(_) => Repository::Other(s.to_owned()),
+            Err(_) => Repository::None,
+        })
 }
 
 #[derive(Deserialize, Debug)]
 pub struct Crate {
-  #[serde(rename = "crate")]
-  pub meta: Metadata,
+    #[serde(rename = "crate")]
+    pub meta: Metadata,
 }
 
 impl Crate {
-  pub fn repository(&self) -> Repository {
-    self.meta.repository.clone()
-  }
+    pub fn repository(&self) -> Repository {
+        self.meta.repository.clone()
+    }
 }
 
 pub fn get(crate_id: &str) -> Result<Crate> {
-  let mut buffer = String::new();
-  let _ = reqwest::Client::new()
-    .get(&format!("https://crates.io/api/v1/crates/{}", crate_id))
-    .send()?
-    .read_to_string(&mut buffer)?;
+    let mut buffer = String::new();
+    let _ = reqwest::Client::new()
+        .get(&format!("https://crates.io/api/v1/crates/{}", crate_id))
+        .send()?
+        .read_to_string(&mut buffer)?;
 
-  Ok(json::from_str(&buffer)?)
+    Ok(json::from_str(&buffer)?)
 }
